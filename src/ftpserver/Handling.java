@@ -7,13 +7,13 @@ import java.util.Scanner;
 
 public class Handling {
     
-    final int SERVER_PORT = 10021;
+    final int CONTROL_CONNECTION_PORT = 21;
     
     public void createServer() throws IOException {
     
-        try(ServerSocket s = new ServerSocket(SERVER_PORT)){
+        try(ServerSocket s = new ServerSocket(CONTROL_CONNECTION_PORT)){
             
-            System.out.println("> FTP Server Started on Port Number " + SERVER_PORT);
+            System.out.println("> FTP Server Started on Port Number " + CONTROL_CONNECTION_PORT);
             
             try(Socket incoming = s.accept()){
                 
@@ -29,23 +29,29 @@ public class Handling {
                     
                     boolean done = false;
                     while(!done && in.hasNextLine()){
+                        
                         String line = in.nextLine();
+                        out.println("> " + line);
                         if(line.trim().equals("BYE")){
                             done = true;
                             out.println("> Connection closed.");
                         }
+                        else if(line.trim().equals("USER anonymous")){
+                            out.println("230 User anonymous logged in.");
+                        }
                         else if(line.trim().equals("GET")){
-                            out.println("> GET Command Received ...");
+                            out.println("> GET Command Received...");
                         }
                         else if(line.trim().equals("SEND")){
-                            out.println("> SEND Command Received ...");
+                            out.println("> SEND Command Received...");
                         }
                         else if(line.trim().equals("PORT")){
-                            out.println("> PORT Command Received ...");
+                            out.println("> PORT Command Received...");
                         }
-                        else if(line.trim().equals("DISCONNECT")){
-                            out.println("> DISCONNECT Command Received ...");
+                        else{
+                            out.println("Unrecognized command.");
                         }
+                        
                     }
                 }
             }

@@ -5,6 +5,9 @@ import java.net.*;
 import java.io.*;
 
 class TransferFile extends Thread {
+    
+    final int DATA_CONNECTION_PORT = 20;
+    
     Socket incoming;
 
     DataInputStream input;
@@ -28,18 +31,18 @@ class TransferFile extends Thread {
         while(true) {
             try {
                 System.out.println("Waiting for Command ...");
-                String Command = input.readUTF();
-                if(Command.compareTo("GET") == 0) {
+                String command = input.readUTF();
+                if(command.compareTo("GET") == 0) {
                     System.out.println("\tGET Command Received ...");
                     sendFile();
                     continue;
                 }
-                else if(Command.compareTo("SEND") == 0) {
+                else if(command.compareTo("SEND") == 0) {
                     System.out.println("\tSEND Command Receiced ...");                
                     recieveFile();
                     continue;
                 }
-                else if(Command.compareTo("DISCONNECT") == 0) {
+                else if(command.compareTo("DISCONNECT") == 0) {
                     System.out.println("\tDisconnect Command Received ...");
                     System.exit(1);
                 }
