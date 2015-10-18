@@ -5,16 +5,15 @@ import java.net.*;
 import java.io.*;
 import java.util.Scanner;
 
-public class Handling {
+public class ControlConnection {
     
-    final int CONTROL_CONNECTION_PORT = 21;
-    final int DATA_CONNECTION_PORT = 20;
+    final int PORT = 21;
     
-    public void createServer() throws IOException {
+    public void createControlChannel() throws IOException {
     
-        try(ServerSocket s = new ServerSocket(CONTROL_CONNECTION_PORT)){
+        try(ServerSocket s = new ServerSocket(PORT)){
             
-            System.out.println("> FTP Server Started on Port Number " + CONTROL_CONNECTION_PORT);
+            System.out.println("> FTP Server Has Started on Port Number " + PORT);
             
             try(Socket incoming = s.accept()){
                 
@@ -52,7 +51,7 @@ public class Handling {
                         }
                         else if(command.trim().equals("EPRT")){
                             out.println("> EPRT Command Received...");
-                            String[] test = erptHandler(argumnet);
+                            String[] args = erptHandler(argumnet);
                         }
                         else if(command.trim().equals("PORT")){
                             out.println("> PORT Command Received...");

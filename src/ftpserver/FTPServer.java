@@ -7,9 +7,9 @@ import java.net.*;
 class FTPServer {
     public static void main(String args[]) throws Exception {
         
-        Handling h = new Handling();
+        ControlConnection controlCon = new ControlConnection();
         try {
-            h.createServer();
+            controlCon.createControlChannel();
         }
         catch (IOException ex){
             ex.printStackTrace();
