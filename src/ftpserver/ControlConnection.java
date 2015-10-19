@@ -50,9 +50,9 @@ public class ControlConnection {
                             out.println("> SEND Command Received...");
                         }
                         else if(command.trim().equals("EPRT")){
-                            out.println("> EPRT Command Received...");
+                            out.println("200 EPRT command successful.");
                             String[] args = erptHandler(argumnet);
-                            DataConnection dc = new DataConnection(Integer.parseInt(args[3]));
+                            DataConnection dc = new DataConnection(args[2], Integer.parseInt(args[3]));
                         }
                         else if(command.trim().equals("PORT")){
                             out.println("> PORT Command Received...");

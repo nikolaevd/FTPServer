@@ -10,14 +10,14 @@ public class DataConnection extends Thread{
     DataInputStream input;
     DataOutputStream output;
     
-    DataConnection(int port) throws IOException{
-        try(Socket s = new Socket("127.0.0.1", port, InetAddress.getLocalHost(), LOCAL_PORT)){
+    DataConnection(String address, int port) throws IOException{
+        try(Socket s = new Socket(address, port, InetAddress.getLocalHost(), LOCAL_PORT)){
             input = new DataInputStream(s.getInputStream());
             output = new DataOutputStream(s.getOutputStream());
             
             System.out.println("Data Connection Has Started...");
             output.writeUTF("Data Connection Has Started...");
-            //start();
+            start();
         }
         catch(IOException ex){
             ex.printStackTrace();
@@ -26,6 +26,11 @@ public class DataConnection extends Thread{
     
     @Override
     public void run(){
-        
+        try{
+            output.writeUTF("active state");
+        }
+        catch(IOException ex){
+            ex.printStackTrace();
+        }
     }
 }
