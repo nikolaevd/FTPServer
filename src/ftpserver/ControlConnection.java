@@ -9,7 +9,7 @@ public class ControlConnection {
     
     final int PORT = 21;
     
-    public void createControlChannel() throws IOException {
+    ControlConnection() throws IOException {
     
         try(ServerSocket s = new ServerSocket(PORT)){
             
@@ -52,6 +52,7 @@ public class ControlConnection {
                         else if(command.trim().equals("EPRT")){
                             out.println("> EPRT Command Received...");
                             String[] args = erptHandler(argumnet);
+                            DataConnection dc = new DataConnection(Integer.parseInt(args[3]));
                         }
                         else if(command.trim().equals("PORT")){
                             out.println("> PORT Command Received...");

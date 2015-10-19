@@ -4,22 +4,24 @@ package ftpserver;
 import java.net.*;
 import java.io.*;
 
-public class DataConnection {
+public class DataConnection extends Thread{
     
-    final int PORT = 20;
+    final int LOCAL_PORT = 20;
+    DataInputStream input;
+    DataOutputStream output;
     
-    public void createDataChannel() throws IOException {
-        
-        try(ServerSocket s = new ServerSocket(PORT)){
+    DataConnection(int port) throws IOException{
+        try(Socket s = new Socket("localhost", port, InetAddress.getLocalHost(), LOCAL_PORT)){
+            input = new DataInputStream(s.getInputStream());
+            output = new DataOutputStream(s.getOutputStream());
             
-            System.out.println("Data Connection Has Started on Port Number " + PORT);
-            
-            try(Socket incoming = s.accept()){
-                DataInputStream inStream = new DataInputStream(incoming.getInputStream());
-                DataOutputStream outStream = new DataOutputStream(incoming.getOutputStream());
-                
-            }
+            System.out.println("Data Connection Has Started...");
+            start();
         }
     }
     
+    @Override
+    public void run(){
+        
+    }
 }

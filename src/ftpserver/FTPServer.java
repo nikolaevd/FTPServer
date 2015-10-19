@@ -8,12 +8,6 @@ class FTPServer {
     public static void main(String args[]) throws Exception {
         
         ControlConnection controlCon = new ControlConnection();
-        try {
-            controlCon.createControlChannel();
-        }
-        catch (IOException ex){
-            ex.printStackTrace();
-        }
         
 //        ServerSocket soc = new ServerSocket(21);
 //        System.out.println("FTP Server Started on Port Number 21");
