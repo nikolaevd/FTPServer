@@ -6,14 +6,17 @@ import java.io.*;
 import java.util.Scanner;
 
 public class ControlConnection {
-    
-    final int PORT = 21;
-    
+     
+    private File f;
+    private String dataAddress;
+    private int dataPort;
+    private final int PORT = 21;
+        
     ControlConnection() throws IOException {
     
         try(ServerSocket s = new ServerSocket(PORT)){
             
-            System.out.println("> FTP Server Has Started on Port Number " + PORT);
+            System.out.println("FTP Server Has Started on Port Number " + PORT + " ...");
             
             try(Socket incoming = s.accept()){
                 
@@ -22,8 +25,8 @@ public class ControlConnection {
                 
                 PrintWriter out = new PrintWriter(outStream, true);
                 
-                out.println("> FTP Client Connected...");
-                out.println("> Enter BYE to exit.");
+                out.println("FTP Client Connected ...");
+                out.println("Enter BYE to exit");
                 
                 try(Scanner in = new Scanner(inStream)){
                     
@@ -38,27 +41,41 @@ public class ControlConnection {
                         
                         if(command.trim().equals("BYE")){
                             done = true;
-                            out.println("> Connection closed.");
+                            out.println("Connection closed");
                         }
-                        else if(command.trim().equals("USER") && argumnet.trim().equals("anonymous")){
-                            out.println("230 User anonymous logged in.");
-                        }
-                        else if(command.trim().equals("GET")){
-                            out.println("> GET Command Received...");
-                        }
-                        else if(command.trim().equals("SEND")){
-                            out.println("> SEND Command Received...");
+                        else if(command.trim().equals("USER")){
+                            if(!argumnet.trim().equals("anonymous")){
+                                out.println("530 Login incorrect");
+                            }
+                            else{
+                                out.println("230 User anonymous logged in");
+                            }
                         }
                         else if(command.trim().equals("EPRT")){
                             out.println("200 EPRT command successful.");
                             String[] args = erptHandler(argumnet);
-                            DataConnection dc = new DataConnection(args[2], Integer.parseInt(args[3]));
+                            dataAddress = args[2];
+                            dataPort = Integer.parseInt(args[3]); 
+                        }
+                        else if(command.trim().equals("STOR")){
+                            out.println("150 Accepted data connection");
+                            f = new File(argumnet);
+                            
+                            if(f.exists()){
+                                out.println("File Already Exists");
+                            }
+                            else{
+                                out.println("SendFile");                                
+                                Runnable r = new DataConnection(dataAddress, dataPort);
+                                Thread t = new Thread(r);
+                                t.start();
+                            }      
                         }
                         else if(command.trim().equals("PORT")){
-                            out.println("> PORT Command Received...");
+                            out.println("PORT Command Received ...");
                         }
                         else{
-                            out.println("> Unrecognized command.");
+                            out.println("Unrecognized command");
                         }
                         
                     }
