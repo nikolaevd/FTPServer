@@ -11,12 +11,16 @@ public class DataConnection extends Thread{
     DataOutputStream output;
     
     DataConnection(int port) throws IOException{
-        try(Socket s = new Socket("localhost", port, InetAddress.getLocalHost(), LOCAL_PORT)){
+        try(Socket s = new Socket("127.0.0.1", port, InetAddress.getLocalHost(), LOCAL_PORT)){
             input = new DataInputStream(s.getInputStream());
             output = new DataOutputStream(s.getOutputStream());
             
             System.out.println("Data Connection Has Started...");
-            start();
+            output.writeUTF("Data Connection Has Started...");
+            //start();
+        }
+        catch(IOException ex){
+            ex.printStackTrace();
         }
     }
     
