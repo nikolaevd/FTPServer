@@ -12,6 +12,8 @@ public class DataConnection implements Runnable{
     private final int port;
     private final File file;
 
+    // в конструкторе класса получаем такие данные как: тип операции (получить или передать файл),
+    // IP-адрес, порт и имя файла
     DataConnection(String typeOfOperation, String address, int port, File file){
         
         this.typeOfOperation = typeOfOperation;
@@ -21,6 +23,7 @@ public class DataConnection implements Runnable{
         
     }
     
+    // содаем новый поток
     @Override
     public void run(){
         
@@ -33,16 +36,22 @@ public class DataConnection implements Runnable{
         
     }
     
+    // метод реализует загрузку файла с клиента на сервер
     private void recieveFile(){
         
+        // создаем сокет на указанном адресе
         try(Socket s = new Socket(address, port)){
+            // создаем поток для чтения данных из сокета
             DataInputStream input = new DataInputStream(s.getInputStream());            
             System.out.println("Data Connection Has Started ...");   
             
+            // создаем поток для записи файлов на сервере
             try(FileOutputStream f = new FileOutputStream(file)){
 
                 int tmp;     
             
+                // пока в потоке есть байты, мы продолжаем их считывать
+                // признаком конца файла является значение -1
                 do{
                     tmp = input.readByte();
                     //System.out.println(tmp);
@@ -62,16 +71,23 @@ public class DataConnection implements Runnable{
 
     }
     
+    // метод реализует передачу данных с сервера на клиент
     private void sendFile(){
         
+        // создаем сокет на уканазонном адресе
         try(Socket s = new Socket(address, port)){
+            // создаем поток для записи данных в сокет (с сервера на клиент)
             DataOutputStream output = new DataOutputStream(s.getOutputStream());            
             System.out.println("Data Connection Has Started ...");
             
+            // создаем поток для чтения данных из файла
             try(FileInputStream f = new FileInputStream(file)){
                 
                 int tmp;
                 
+                // читаем байты из файла и записываем их исходяший поток сокета
+                // признаком конца файла является -1
+                // (передаем данные с сервера на клиент
                 do{
                     tmp = f.read();
                     System.out.println(tmp);
