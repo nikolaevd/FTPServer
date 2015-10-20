@@ -62,7 +62,7 @@ public class ControlConnection {
                                     out.println("230 User anonymous logged in");
                                 }   break;
                             case "EPRT":
-                                out.println("200 EPRT command successful.");
+                                out.println("200 EPRT command successful");
                                 // получаем данные из аргументов команды EPRT
                                 String[] args = eprtHandler(argumnet);
                                 dataAddress = args[2];
@@ -78,12 +78,21 @@ public class ControlConnection {
                                 }
                                 // если нет, то начинаем загрузку
                                 else{
-                                    out.println("SendFile");
+                                    out.println("Send File");
                                     // устанавливаем в отдельном потоке соединение для передачи данных
                                     Runnable r = new DataConnection("send", dataAddress, dataPort, file);
                                     Thread t = new Thread(r);
                                     t.start();
-                                }   break;
+                                } break;
+                            case "RETR":
+                                // команда предписывает скачать файл с сервера
+                                out.println("150 OK to get data");
+                                file = new File(argumnet);
+                                out.println("Get File");
+                                Runnable r = new DataConnection("get", dataAddress, dataPort, file);
+                                Thread t = new Thread(r);
+                                t.start();
+                                break;
                             default:
                                 // полученная команда нераспознана 
                             out.println("Unrecognized command");

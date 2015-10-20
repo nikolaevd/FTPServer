@@ -13,10 +13,12 @@ public class DataConnection implements Runnable{
     private final File file;
 
     DataConnection(String typeOfOperation, String address, int port, File file){
+        
         this.typeOfOperation = typeOfOperation;
         this.address = address;
         this.port = port;
         this.file = file;
+        
     }
     
     @Override
@@ -24,7 +26,11 @@ public class DataConnection implements Runnable{
         
         if(typeOfOperation.equals("send")){
             recieveFile();
-        }        
+        }
+        if(typeOfOperation.equals("get")){
+            sendFile();
+        }
+        
     }
     
     private void recieveFile(){
@@ -33,16 +39,16 @@ public class DataConnection implements Runnable{
             DataInputStream input = new DataInputStream(s.getInputStream());            
             System.out.println("Data Connection Has Started ...");   
             
-            try(FileWriter f = new FileWriter(file)){
+            try(FileOutputStream f = new FileOutputStream(file)){
 
-                byte tmp;     
+                int tmp;     
             
                 do{
                     tmp = input.readByte();
                     //System.out.println(tmp);
                     f.write(tmp);
                 }
-                while(tmp != 0);    
+                while(tmp != -1);    
             }
             
             catch(IOException ex){
@@ -57,6 +63,30 @@ public class DataConnection implements Runnable{
     }
     
     private void sendFile(){
+        
+        try(Socket s = new Socket(address, port)){
+            DataOutputStream output = new DataOutputStream(s.getOutputStream());            
+            System.out.println("Data Connection Has Started ...");
+            
+            try(FileInputStream f = new FileInputStream(file)){
+                
+                int tmp;
+                
+                do{
+                    tmp = f.read();
+                    System.out.println(tmp);
+                    output.writeByte(tmp);
+                }
+                while(tmp != -1);      
+            }
+            catch(IOException ex){
+                ex.printStackTrace();
+            }
+        }
+        
+        catch(IOException ex){
+            ex.printStackTrace();
+        }
         
     }
    
