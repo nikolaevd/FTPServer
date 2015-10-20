@@ -4,6 +4,7 @@ package ftpserver;
 import java.net.*;
 import java.io.*;
 
+// клас реализует соединение для передачи данных
 public class DataConnection implements Runnable{
     
 //    private final int LOCAL_PORT = 20;
