@@ -7,34 +7,32 @@ import java.util.Scanner;
 
 public class ControlConnection {
      
-    private File f;
+    private File file;
     private String dataAddress;
     private int dataPort;
     private final int PORT = 21;
         
     ControlConnection() throws IOException {
         
-        // создаем серверный сокет, для возможности программ устанавливать соединение для обмена данными по сети
-        // данное сетевое соединение предназначено для управляющего канала (канал для обмена командами)
+        // создаем серверный сокет, позволяющий программам устанавливать с ним соединение для обмена данными по сети
         try(ServerSocket s = new ServerSocket(PORT)){
             
             System.out.println("FTP Server Has Started on Port Number " + PORT + " ...");
             
-            // предписываем сокеты ожидать подключение на указанном порту (21)
+            // предписываем сокету ожидать подключение на указанном порту (21)
             try(Socket incoming = s.accept()){
                 
-                // inStream - используется для чтения данных из сокета
+                // потоки in и out используются для чтения и записи данных из сокета
                 InputStream inStream = incoming.getInputStream();
-                // outStram - используется для отправки данных через сокет
                 OutputStream outStream = incoming.getOutputStream();
                 
-                // данный объект нужен для отправки текстовых (String) команд
+                // объект используется для отправки текстовых команд в исходящий поток outStream
                 PrintWriter out = new PrintWriter(outStream, true);
                 
                 out.println("FTP Client Connected ...");
                 out.println("Enter BYE to exit");
                 
-                // объект типа Scanner нужен для чтения текса (данных типа String) из потока inStream
+                // Scanner используется для чтения текса (данных типа String) из входящего потока inStream
                 try(Scanner in = new Scanner(inStream)){
                     
                     // в данном цикле мы считываем и выводим в консоль текстовые строки из входящего потока inStream
@@ -49,48 +47,47 @@ public class ControlConnection {
                         
                         // в данном ветвлении распознаем какую команду мы получили
                         // и в зависимости от команды, выполняем определенные действия
-                        if(command.trim().equals("BYE")){
-                            done = true;
-                            out.println("Connection closed");
-                        }
-                        else if(command.trim().equals("USER")){
-                            if(!argumnet.trim().equals("anonymous")){
-                                // неверное имя пользователя
-                                out.println("530 Login incorrect");
-                            }
-                            else{
-                                // авторизация успешно пройдена
-                                out.println("230 User anonymous logged in");
-                            }
-                        }
-                        else if(command.trim().equals("EPRT")){
-                            out.println("200 EPRT command successful.");
-                            // получаем данные из аргументов команды EPRT
-                            String[] args = eprtHandler(argumnet);
-                            dataAddress = args[2];
-                            dataPort = Integer.parseInt(args[3]); 
-                        }
-                        else if(command.trim().equals("STOR")){
-                            //  команда предписывает загрузить файл на сервер
-                            out.println("150 Accepted data connection");
-                            f = new File(argumnet);
-                            
-                            // проверяем, существует ли уже файл с таким именем
-                            if(f.exists()){
-                                out.println("File Already Exists");
-                            }
-                            // если нет, то начинаем загрузку
-                            else{
-                                out.println("SendFile");
-                                // устанавливаем в отдельном потоке соединение для передачи данных
-                                Runnable r = new DataConnection(dataAddress, dataPort);
-                                Thread t = new Thread(r);
-                                t.start();
-                            }      
-                        }
-                        else{
-                            // полученная команда нераспознана 
+                        switch (command.trim()) {
+                            case "BYE":
+                                done = true;
+                                out.println("Connection closed");
+                                break;
+                            case "USER":
+                                if(!argumnet.trim().equals("anonymous")){
+                                    // неверное имя пользователя
+                                    out.println("530 Login incorrect");
+                                }
+                                else{
+                                    // авторизация успешно пройдена
+                                    out.println("230 User anonymous logged in");
+                                }   break;
+                            case "EPRT":
+                                out.println("200 EPRT command successful.");
+                                // получаем данные из аргументов команды EPRT
+                                String[] args = eprtHandler(argumnet);
+                                dataAddress = args[2];
+                                dataPort = Integer.parseInt(args[3]);
+                                break;
+                            case "STOR":
+                                //  команда предписывает загрузить файл на сервер
+                                out.println("150 Accepted data connection");
+                                file = new File(argumnet);
+                                // проверяем, существует ли уже файл с таким именем
+                                if(file.exists()){
+                                    out.println("File Already Exists");
+                                }
+                                // если нет, то начинаем загрузку
+                                else{
+                                    out.println("SendFile");
+                                    // устанавливаем в отдельном потоке соединение для передачи данных
+                                    Runnable r = new DataConnection("send", dataAddress, dataPort, file);
+                                    Thread t = new Thread(r);
+                                    t.start();
+                                }   break;
+                            default:
+                                // полученная команда нераспознана 
                             out.println("Unrecognized command");
+                                break;
                         }
                         
                     }

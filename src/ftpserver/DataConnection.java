@@ -4,46 +4,60 @@ package ftpserver;
 import java.net.*;
 import java.io.*;
 
-// клас реализует соединение для передачи данных
+// класс реализует соединение для передачи данных
 public class DataConnection implements Runnable{
     
-//    private final int LOCAL_PORT = 20;
-//    private final InetAddress LOCAL_ADDRESS = InetAddress.getLocalHost();
-    private DataInputStream input;
-    private DataOutputStream output;
-    private String address;
-    private int port;
+    private final String typeOfOperation;
+    private final String address;
+    private final int port;
+    private final File file;
 
-    DataConnection(String addres, int port){
-        this.address = addres;
+    DataConnection(String typeOfOperation, String address, int port, File file){
+        this.typeOfOperation = typeOfOperation;
+        this.address = address;
         this.port = port;
+        this.file = file;
     }
     
     @Override
     public void run(){
-        //System.setProperty("java.net.preferIPv4Stack" , "true");
+        
+        if(typeOfOperation.equals("send")){
+            recieveFile();
+        }        
+    }
+    
+    private void recieveFile(){
+        
         try(Socket s = new Socket(address, port)){
-            input = new DataInputStream(s.getInputStream());
-            output = new DataOutputStream(s.getOutputStream());
+            DataInputStream input = new DataInputStream(s.getInputStream());            
+            System.out.println("Data Connection Has Started ...");   
             
-            System.out.println("> Data Connection Has Started ...");
-            try{
-                FileWriter file = new FileWriter("HaxLogs.txt");
-                String str;
+            try(FileWriter f = new FileWriter(file)){
+
+                byte tmp;     
+            
                 do{
-                    str = input.readUTF();
-                    file.write(str);
+                    tmp = input.readByte();
+                    //System.out.println(tmp);
+                    f.write(tmp);
                 }
-                while(str != null);    
-                file.close();
+                while(tmp != 0);    
             }
+            
             catch(IOException ex){
-            ex.printStackTrace();
+                ex.printStackTrace();
             }
         }
+        
         catch(IOException ex){
             ex.printStackTrace();
         }
+
+    }
+    
+    private void sendFile(){
+        
     }
    
 }
