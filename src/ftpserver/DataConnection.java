@@ -12,7 +12,7 @@ public class DataConnection implements Runnable{
     private final int port;
     private final File file;
 
-    // в конструкторе класса получаем такие данные как: тип операции (получить или передать файл),
+    // конструктор класса принимает параметр "тип операции" (получить или передать файл),
     // IP-адрес, порт и имя файла
     DataConnection(String typeOfOperation, String address, int port, File file){
         
@@ -23,7 +23,7 @@ public class DataConnection implements Runnable{
         
     }
     
-    // содаем новый поток
+    // в этом методе размещен код для нового потока
     @Override
     public void run(){
         
@@ -85,9 +85,9 @@ public class DataConnection implements Runnable{
                 
                 int tmp;
                 
-                // читаем байты из файла и записываем их исходяший поток сокета
+                // читаем байты из файла и записываем их в исходяший поток сокета
+                // (передаем данные с сервера на клиент)
                 // признаком конца файла является -1
-                // (передаем данные с сервера на клиент
                 do{
                     tmp = f.read();
                     System.out.println(tmp);

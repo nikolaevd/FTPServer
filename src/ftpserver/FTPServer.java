@@ -4,7 +4,7 @@ package ftpserver;
 class FTPServer {
     public static void main(String args[]) throws Exception {
         
-        // создаем объект класса, отвечающий за управляющее соединение
+        // создаем экземпляр класса, отвечающий за организацию управляющего соединения
         new ControlConnection();   
         
     }
