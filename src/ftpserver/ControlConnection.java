@@ -47,57 +47,92 @@ public class ControlConnection {
                         
                         // распознаем какую команду мы получили
                         // в зависимости от команды, выполняем определенные действия
-                        switch (command.trim()) {
-                            case "BYE":
-                                done = true;
-                                out.println("Connection closed");
-                                break;
-                            case "USER":
-                                if(!argumnet.trim().equals("anonymous")){
-                                    // неверное имя пользователя
-                                    out.println("530 Login incorrect");
-                                }
-                                else{
-                                    // авторизация успешно пройдена
-                                    out.println("230 User anonymous logged in");
-                                }   break;
-                            case "EPRT":
-                                out.println("200 EPRT command successful");
-                                // получаем данные из аргументов команды EPRT
-                                String[] args = eprtHandler(argumnet);
-                                dataAddress = args[2];
-                                dataPort = Integer.parseInt(args[3]);
-                                break;
-                            case "STOR":
-                                //  команда предписывает загрузить файл на сервер
-                                out.println("150 Accepted data connection");
-                                file = new File(argumnet);
-                                // проверяем, существует ли уже файл с таким именем
-                                if(file.exists()){
-                                    out.println("File Already Exists");
-                                }
-                                // если нет, то начинаем загрузку
-                                else{
-                                    out.println("Send File");
-                                    // устанавливаем в отдельном потоке соединение для передачи данных
-                                    Runnable r = new DataConnection("send", dataAddress, dataPort, file);
-                                    Thread t = new Thread(r);
-                                    t.start();
-                                } break;
-                            case "RETR":
-                                // команда предписывает скачать файл с сервера
-                                out.println("150 OK to get data");
-                                file = new File(argumnet);
-                                out.println("Get File");
-                                Runnable r = new DataConnection("get", dataAddress, dataPort, file);
-                                Thread t = new Thread(r);
-                                t.start();
-                                break;
-                            default:
-                                // полученная команда нераспознана 
-                            out.println("Unrecognized command");
-                                break;
+                        if(command.trim().equals("BYE")){
+                            done = true;
+                            out.println("Connection closed");
                         }
+                        else if(command.trim().equals("USER")){
+                            if(!argumnet.trim().equals("anonymous")){
+                                out.println("530 Login incorrect");
+                            }
+                            else{
+                                out.println("230 User anonymous logged in");
+                            }
+                        }
+                        else if(command.trim().equals("EPRT")){
+                            out.println("200 EPRT command successful");
+                            String[] args = eprtHandler(argumnet);
+                            dataAddress = args[2];
+                            dataPort = Integer.parseInt(args[3]);
+                        }
+                        else if(command.trim().equals("STOR")){
+                            out.println("150 Accepted data connection");
+                            file = new File(argumnet);
+                            
+                            if(file.exists()){
+                                out.println("File Already Exists");
+                            }                            
+                            else{
+                                out.println("Send File");
+                                Runnable rStor = new DataConnection("send", dataAddress, dataPort, file);
+                                Thread tStor = new Thread(rStor);
+                                tStor.start();
+                            }
+                        }
+                        else if(command.trim().equals("RETR")){
+                            out.println("150 Opening data channel for download from server");
+                            out.println("150 Opening data channel for download from server");
+                            out.println("150 Opening data channel for download from server");
+                        }
+                        else{
+                            out.println("Unrecognized command");
+                        }
+                        
+//                        switch (command.trim()) {
+//                            case "BYE":
+//                                done = true;
+//                                out.println("Connection closed");
+//                                break;
+//                            case "USER":
+//                                if(!argumnet.trim().equals("anonymous")){
+//                                    // неверное имя пользователя
+//                                    out.println("530 Login incorrect");
+//                                }
+//                                else{
+//                                    // авторизация успешно пройдена
+//                                    out.println("230 User anonymous logged in");
+//                                } break;
+//                            case "EPRT":
+//                                out.println("200 EPRT command successful");
+//                                // получаем данные из аргументов команды EPRT
+//                                String[] args = eprtHandler(argumnet);
+//                                dataAddress = args[2];
+//                                dataPort = Integer.parseInt(args[3]);
+//                               // break;
+//                            case "RETR":
+//                                out.println("150 Opening data channel for download from server");
+//                                break;
+//                            case "STOR":
+//                                //  команда предписывает загрузить файл на сервер
+//                                out.println("150 Accepted data connection");
+//                                file = new File(argumnet);
+//                                // проверяем, существует ли уже файл с таким именем
+//                                if(file.exists()){
+//                                    out.println("File Already Exists");
+//                                }
+//                                // если нет, то начинаем загрузку
+//                                else{
+//                                    out.println("Send File");
+//                                    // устанавливаем в отдельном потоке соединение для передачи данных
+//                                    Runnable rStor = new DataConnection("send", dataAddress, dataPort, file);
+//                                    Thread tStor = new Thread(rStor);
+//                                    tStor.start();
+//                                } break;                            
+//                            default:
+//                                // полученная команда нераспознана 
+//                                out.println("Unrecognized command");
+//                                break;
+//                        }
                         
                     }
                 }

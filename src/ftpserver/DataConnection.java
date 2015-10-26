@@ -75,25 +75,32 @@ public class DataConnection implements Runnable{
     private void sendFile(){
         
         // создаем сокет на уканазонном адресе
-        try(Socket s = new Socket(address, port)){
+        try(ServerSocket s = new ServerSocket(20)){
             // создаем поток для записи данных в сокет (с сервера на клиент)
-            DataOutputStream output = new DataOutputStream(s.getOutputStream());            
+            Socket incomig = s.accept();
             System.out.println("Data Connection Has Started ...");
             
+            OutputStream output = incomig.getOutputStream();
+            
             // создаем поток для чтения данных из файла
-            try(FileInputStream f = new FileInputStream(file)){
-                
+            try(FileReader f = new FileReader(file)){
+                BufferedReader reader = new BufferedReader(f);
                 int tmp;
+                
+                while((tmp = reader.read()) != -1){
+                    output.write(tmp);
+                }
+                reader.close();
                 
                 // читаем байты из файла и записываем их в исходяший поток сокета
                 // т.е., передаем данные с сервера на клиент
                 // признаком конца файла является -1
-                do{
-                    tmp = f.read();
-                    System.out.println(tmp);
-                    output.writeByte(tmp);
-                }
-                while(tmp != -1);      
+//                do{
+//                    tmp = f.read();
+//                    System.out.println(tmp);
+//                    output.writeByte(tmp);
+//                }
+//                while(tmp != -1);      
             }
             catch(IOException ex){
                 ex.printStackTrace();
