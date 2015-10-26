@@ -19,7 +19,7 @@ public class DataConnection implements Runnable{
         this.typeOfOperation = typeOfOperation;
         this.address = address;
         this.port = port;
-        this.file = file;
+        this.file = file;;
         
     }
     
@@ -75,6 +75,7 @@ public class DataConnection implements Runnable{
     private void sendFile(){
         
         try(Socket s = new Socket(address, port)){
+            s.bind(new InetSocketAddress("::1", 20));
             DataOutputStream output = new DataOutputStream(s.getOutputStream());
             
             FileReader fileReader = new FileReader(file);
