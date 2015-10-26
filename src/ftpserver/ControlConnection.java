@@ -80,59 +80,17 @@ public class ControlConnection {
                             }
                         }
                         else if(command.trim().equals("RETR")){
-                            out.println("150 Opening data channel for download from server");
-                            out.println("150 Opening data channel for download from server");
-                            out.println("150 Opening data channel for download from server");
+                            out.println("150 File status okay.\r\n");
+                            System.out.println("Retrieve File");
+                            file = new File(argumnet);
+                            file = file.getAbsoluteFile();
+                            Runnable rRetr = new DataConnection("get", dataAddress, PORT, file);
+                            Thread tRetr = new Thread(rRetr);
+                            tRetr.start();
                         }
                         else{
                             out.println("Unrecognized command");
-                        }
-                        
-//                        switch (command.trim()) {
-//                            case "BYE":
-//                                done = true;
-//                                out.println("Connection closed");
-//                                break;
-//                            case "USER":
-//                                if(!argumnet.trim().equals("anonymous")){
-//                                    // неверное имя пользователя
-//                                    out.println("530 Login incorrect");
-//                                }
-//                                else{
-//                                    // авторизация успешно пройдена
-//                                    out.println("230 User anonymous logged in");
-//                                } break;
-//                            case "EPRT":
-//                                out.println("200 EPRT command successful");
-//                                // получаем данные из аргументов команды EPRT
-//                                String[] args = eprtHandler(argumnet);
-//                                dataAddress = args[2];
-//                                dataPort = Integer.parseInt(args[3]);
-//                               // break;
-//                            case "RETR":
-//                                out.println("150 Opening data channel for download from server");
-//                                break;
-//                            case "STOR":
-//                                //  команда предписывает загрузить файл на сервер
-//                                out.println("150 Accepted data connection");
-//                                file = new File(argumnet);
-//                                // проверяем, существует ли уже файл с таким именем
-//                                if(file.exists()){
-//                                    out.println("File Already Exists");
-//                                }
-//                                // если нет, то начинаем загрузку
-//                                else{
-//                                    out.println("Send File");
-//                                    // устанавливаем в отдельном потоке соединение для передачи данных
-//                                    Runnable rStor = new DataConnection("send", dataAddress, dataPort, file);
-//                                    Thread tStor = new Thread(rStor);
-//                                    tStor.start();
-//                                } break;                            
-//                            default:
-//                                // полученная команда нераспознана 
-//                                out.println("Unrecognized command");
-//                                break;
-//                        }
+                        }      
                         
                     }
                 }

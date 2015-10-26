@@ -54,7 +54,7 @@ public class DataConnection implements Runnable{
                 // признаком конца файла является значение -1
                 do{
                     tmp = input.readByte();
-                    //System.out.println(tmp);
+                    System.out.println(tmp);
                     f.write(tmp);
                 }
                 while(tmp != -1);    
@@ -74,39 +74,30 @@ public class DataConnection implements Runnable{
     // метод реализует передачу данных с сервера на клиент
     private void sendFile(){
         
-        // создаем сокет на уканазонном адресе
-        try(ServerSocket s = new ServerSocket(20)){
-            // создаем поток для записи данных в сокет (с сервера на клиент)
-            Socket incomig = s.accept();
-            System.out.println("Data Connection Has Started ...");
+        try(Socket s = new Socket(address, port)){
+            DataOutputStream output = new DataOutputStream(s.getOutputStream());
+            output.writeUTF("150 File status okay.\r\n");
             
-            OutputStream output = incomig.getOutputStream();
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+           
+            int tmp;
             
-            // создаем поток для чтения данных из файла
-            try(FileReader f = new FileReader(file)){
-                BufferedReader reader = new BufferedReader(f);
-                int tmp;
-                
-                while((tmp = reader.read()) != -1){
-                    output.write(tmp);
-                }
-                reader.close();
-                
-                // читаем байты из файла и записываем их в исходяший поток сокета
-                // т.е., передаем данные с сервера на клиент
-                // признаком конца файла является -1
-//                do{
-//                    tmp = f.read();
-//                    System.out.println(tmp);
-//                    output.writeByte(tmp);
-//                }
-//                while(tmp != -1);      
+            do{
+                tmp = br.read();
+                output.writeByte(tmp);
+                System.out.println(tmp);
             }
-            catch(IOException ex){
-                ex.printStackTrace();
-            }
+            while(tmp != -1);
+            
+//            String line = null;
+//            
+//            while((line = br.readLine()) != null){
+//                output.writeUTF(line);
+//            }
+            output.writeUTF("226 Requested file action completed.\r\n");
+            System.out.println("File Sended");
         }
-        
         catch(IOException ex){
             ex.printStackTrace();
         }
