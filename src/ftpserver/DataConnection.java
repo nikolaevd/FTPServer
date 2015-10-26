@@ -76,27 +76,20 @@ public class DataConnection implements Runnable{
         
         try(Socket s = new Socket(address, port)){
             DataOutputStream output = new DataOutputStream(s.getOutputStream());
-            output.writeUTF("150 File status okay.\r\n");
             
-            FileReader fr = new FileReader(file);
-            BufferedReader br = new BufferedReader(fr);
+            FileReader fileReader = new FileReader(file);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
            
             int tmp;
             
             do{
-                tmp = br.read();
+                tmp = bufferedReader.read();
                 output.writeByte(tmp);
                 System.out.println(tmp);
             }
             while(tmp != -1);
             
-//            String line = null;
-//            
-//            while((line = br.readLine()) != null){
-//                output.writeUTF(line);
-//            }
-            output.writeUTF("226 Requested file action completed.\r\n");
-            System.out.println("File Sended");
+            System.out.println("File Has Sended");
         }
         catch(IOException ex){
             ex.printStackTrace();

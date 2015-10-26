@@ -80,11 +80,11 @@ public class ControlConnection {
                             }
                         }
                         else if(command.trim().equals("RETR")){
-                            out.println("150 File status okay.\r\n");
-                            System.out.println("Retrieve File");
+                            out.println("150 File status okay");
+                            System.out.println("Starting Retrieve File");
                             file = new File(argumnet);
-                            file = file.getAbsoluteFile();
-                            Runnable rRetr = new DataConnection("get", dataAddress, PORT, file);
+                            //file = file.getAbsoluteFile();
+                            Runnable rRetr = new DataConnection("get", dataAddress, dataPort, file);
                             Thread tRetr = new Thread(rRetr);
                             tRetr.start();
                         }
