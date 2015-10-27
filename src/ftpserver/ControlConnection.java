@@ -67,23 +67,29 @@ public class ControlConnection {
                                 out.println("200 EPRT command successful");
                                 break;
                             case "STOR":
-                                out.println("150 Accepted data connection");
                                 file = new File(argumnet);
                                 if(file.exists()){
-                                    out.println("File Already Exists");
+                                    out.println("500 File already exists");
                                 }
                                 else{
+                                    out.println("150 Accepted data connection");
                                     Runnable rStor = new DataConnection("send", dataAddress, dataPort, file);
                                     Thread tStor = new Thread(rStor);
                                     tStor.start();
+                                    out.println("226 Successfully transferred");
                                 }   break;
                             case "RETR":
-                                out.println("150 Accepted data connection");
                                 file = new File(argumnet);
-                                file = file.getAbsoluteFile();
-                                Runnable rRetr = new DataConnection("get", dataAddress, dataPort, file);
-                                Thread tRetr = new Thread(rRetr);
-                                tRetr.start();
+                                if(file.exists()){
+                                    out.println("150 Accepted data connection");
+                                    Runnable rRetr = new DataConnection("get", dataAddress, dataPort, file);
+                                    Thread tRetr = new Thread(rRetr);
+                                    tRetr.start();
+                                    out.println("226 Successfully transferred");
+                                }
+                                else{
+                                    out.println("550 File Not Found");
+                                }
                                 break;
                             default:
                                 out.println("500 Unrecognized command");

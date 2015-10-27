@@ -42,17 +42,19 @@ public class DataConnection implements Runnable{
         // создаем сокет на указанном адресе
         try(Socket socket = new Socket(address, port)){
             // создаем поток для чтения данных из сокета
-            DataInputStream dataInput = new DataInputStream(socket.getInputStream());            
+            DataInputStream dataInput = new DataInputStream(socket.getInputStream());
+            // чтобы не читать каждую строку из потока по отдельности, подключаем dataInput к потоку BufferedInputStream
+            BufferedInputStream bufferedInput = new BufferedInputStream(dataInput);
             
             // создаем поток для записи файлов на сервере
             try(FileOutputStream fileOutput = new FileOutputStream(file)){
 
                 int tmp;     
-            
+                
                 // пока в потоке есть байты, мы продолжаем их считывать
                 // признаком конца файла является значение -1
                 do{
-                    tmp = dataInput.readByte();
+                    tmp = bufferedInput.read();
                     fileOutput.write(tmp);
                 }
                 while(tmp != -1);
