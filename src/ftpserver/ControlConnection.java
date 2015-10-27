@@ -12,7 +12,7 @@ public class ControlConnection {
     private int dataPort;
     private final int PORT = 21;
         
-    ControlConnection() throws IOException {
+    ControlConnection() throws IOException{
         
         // создаем серверный сокет, позволяющий программам устанавливать с ним соединение для обмена данными по сети
         try(ServerSocket s = new ServerSocket(PORT)){
@@ -40,57 +40,55 @@ public class ControlConnection {
                     while(!done && in.hasNextLine()){
                         
                         String line = in.nextLine();
-                        out.println(line);
+                        if(!line.equals("RETR HaxLogs.txt")){
+                            out.println(line);
+                        }
                         
                         String command = parseCommand(line);
                         String argumnet = parseArgument(line);
                         
-                        // распознаем какую команду мы получили
-                        // в зависимости от команды, выполняем определенные действия
-                        if(command.trim().equals("BYE")){
-                            done = true;
-                            out.println("Connection closed");
+                        // в зависимости от полученной команды, выполняем определенные действия
+                        switch (command.trim()) {
+                            case "BYE":
+                                done = true;
+                                out.println("426 Connection closed");
+                                break;
+                            case "USER":
+                                if(!argumnet.trim().equals("anonymous")){
+                                    out.println("530 Login incorrect");
+                                }
+                                else{
+                                    out.println("230 User anonymous logged in");
+                                }   break;
+                            case "EPRT":
+                                String[] args = eprtHandler(argumnet);
+                                dataAddress = args[2];
+                                dataPort = Integer.parseInt(args[3]);
+                                out.println("200 EPRT command successful");
+                                break;
+                            case "STOR":
+                                out.println("150 Accepted data connection");
+                                file = new File(argumnet);
+                                if(file.exists()){
+                                    out.println("File Already Exists");
+                                }
+                                else{
+                                    Runnable rStor = new DataConnection("send", dataAddress, dataPort, file);
+                                    Thread tStor = new Thread(rStor);
+                                    tStor.start();
+                                }   break;
+                            case "RETR":
+                                out.println("150 Accepted data connection");
+                                file = new File(argumnet);
+                                file = file.getAbsoluteFile();
+                                Runnable rRetr = new DataConnection("get", dataAddress, dataPort, file);
+                                Thread tRetr = new Thread(rRetr);
+                                tRetr.start();
+                                break;
+                            default:
+                                out.println("500 Unrecognized command");
+                                break;
                         }
-                        else if(command.trim().equals("USER")){
-                            if(!argumnet.trim().equals("anonymous")){
-                                out.println("530 Login incorrect");
-                            }
-                            else{
-                                out.println("230 User anonymous logged in");
-                            }
-                        }
-                        else if(command.trim().equals("EPRT")){
-                            out.println("200 EPRT command successful");
-                            String[] args = eprtHandler(argumnet);
-                            dataAddress = args[2];
-                            dataPort = Integer.parseInt(args[3]);
-                        }
-                        else if(command.trim().equals("STOR")){
-                            out.println("150 Accepted data connection");
-                            file = new File(argumnet);
-                            
-                            if(file.exists()){
-                                out.println("File Already Exists");
-                            }                            
-                            else{
-                                out.println("Send File");
-                                Runnable rStor = new DataConnection("send", dataAddress, dataPort, file);
-                                Thread tStor = new Thread(rStor);
-                                tStor.start();
-                            }
-                        }
-                        else if(command.trim().equals("RETR")){
-                            out.println("150 File status okay");
-                            System.out.println("Starting Retrieve File");
-                            file = new File(argumnet);
-                            //file = file.getAbsoluteFile();
-                            Runnable rRetr = new DataConnection("get", dataAddress, dataPort, file);
-                            Thread tRetr = new Thread(rRetr);
-                            tRetr.start();
-                        }
-                        else{
-                            out.println("Unrecognized command");
-                        }      
                         
                     }
                 }
