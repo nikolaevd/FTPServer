@@ -72,13 +72,13 @@ public class DataConnection implements Runnable{
 
                 BufferedReader bufferedReader = new BufferedReader(fileReader);
            
-            int tmp;
+                int tmp;
 
-            do{
-                tmp = bufferedReader.read();
-                dataOutput.writeByte(tmp);
-            }
-            while(tmp != -1);
+                do{
+                    tmp = bufferedReader.read();
+                    dataOutput.writeByte(tmp);
+                }
+                while(tmp != -1);
             
             }
             
