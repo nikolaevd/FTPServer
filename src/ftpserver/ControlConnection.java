@@ -14,28 +14,22 @@ public class ControlConnection {
         
     ControlConnection() throws IOException{
         
-        // создаем серверный сокет, позволяющий программам устанавливать с ним соединение для обмена данными по сети
         try(ServerSocket s = new ServerSocket(PORT)){
             
             System.out.println("FTP Server Has Started on Port Number " + PORT + " ...");
             
-            // предписываем сокету ожидать подключение на указанном порту (21)
             try(Socket incoming = s.accept()){
                 
-                // потоки in и out используются для чтения и записи данных из сокета
                 InputStream inStream = incoming.getInputStream();
                 OutputStream outStream = incoming.getOutputStream();
                 
-                // объект используется для отправки текстовых команд в исходящий поток outStream
                 PrintWriter out = new PrintWriter(outStream, true);
                 
                 out.println("FTP Client Connected ...");
                 out.println("Enter BYE to exit");
                 
-                // Scanner используется для чтения команд из входящего потока inStream
                 try(Scanner in = new Scanner(inStream)){
                     
-                    // в данном цикле мы считываем и выводим в консоль текстовые строки из входящего потока inStream
                     boolean done = false;
                     while(!done && in.hasNextLine()){
                         
@@ -47,7 +41,6 @@ public class ControlConnection {
                         String command = parseCommand(line);
                         String argumnet = parseArgument(line);
                         
-                        // в зависимости от полученной команды, выполняем определенные действия
                         switch (command.trim()) {
                             case "BYE":
                                 done = true;
@@ -102,8 +95,6 @@ public class ControlConnection {
         }
     }
     
-    // метод приниает на вход строку (команда + аргументы) и отделяют команду от остального текста
-    // текст команды присваевается переменной command
     private String parseCommand(String str){
         String command = "";
         
@@ -116,8 +107,6 @@ public class ControlConnection {
         return command;
     }    
     
-    // метод отделяет аргументы от команды
-    // аргументы записываются в переменную argument
     private String parseArgument(String str){
         String argument = "";
         
@@ -130,8 +119,6 @@ public class ControlConnection {
         return argument;
     }
     
-    // метод расщепляет аргументы команды eprt
-    // и записывает каждый в ячейку строкового массива
     private String[] eprtHandler(String str){
         String[] erpt = str.split("\\|");
         return erpt; 

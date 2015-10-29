@@ -4,7 +4,6 @@ package ftpserver;
 import java.net.*;
 import java.io.*;
 
-// класс реализует соединение для передачи данных
 public class DataConnection implements Runnable{
     
     private final String typeOfOperation;
@@ -12,8 +11,6 @@ public class DataConnection implements Runnable{
     private final int port;
     private final File file;
 
-    // конструктор класса принимает параметр "тип операции" (операция на получение или передачу файла)
-    // IP-адрес, порт и имя файла
     DataConnection(String typeOfOperation, String address, int port, File file){
         
         this.typeOfOperation = typeOfOperation;
@@ -23,7 +20,6 @@ public class DataConnection implements Runnable{
         
     }
     
-    // в этом методе размещен код для нового потока
     @Override
     public void run(){
         
@@ -36,23 +32,17 @@ public class DataConnection implements Runnable{
         
     }
     
-    // метод реализует загрузку файла с клиента на сервер
     private void recieveFile(){
         
-        // создаем сокет на указанном адресе
         try(Socket socket = new Socket(address, port)){
-            // создаем поток для чтения данных из сокета
+            
             DataInputStream dataInput = new DataInputStream(socket.getInputStream());
-            // чтобы не читать каждую строку из потока по отдельности, подключаем dataInput к потоку BufferedInputStream
             BufferedInputStream bufferedInput = new BufferedInputStream(dataInput);
             
-            // создаем поток для записи файлов на сервере
             try(FileOutputStream fileOutput = new FileOutputStream(file)){
 
                 int tmp;     
                 
-                // пока в потоке есть байты, мы продолжаем их считывать
-                // признаком конца файла является значение -1
                 do{
                     tmp = bufferedInput.read();
                     fileOutput.write(tmp);
@@ -72,22 +62,18 @@ public class DataConnection implements Runnable{
 
     }
     
-    // метод реализует передачу данных с сервера на клиент
     private void sendFile(){
         
         try(Socket socket = new Socket(address, port)){
-            // создаем поток для записи данных и подключаем к нему исходящий поток сокета
+            
             DataOutputStream dataOutput = new DataOutputStream(socket.getOutputStream());
             
-            // читаем файл
             try(FileReader fileReader = new FileReader(file)){
-                // чтобы не читать каждую строку из файла вручную, подключаем fileReader к потоку BufferedReader
+
                 BufferedReader bufferedReader = new BufferedReader(fileReader);
            
             int tmp;
-            
-            // пока в потоке есть байты, мы продолжаем их считывать
-            // признаком конца файла является значение -1
+
             do{
                 tmp = bufferedReader.read();
                 dataOutput.writeByte(tmp);
