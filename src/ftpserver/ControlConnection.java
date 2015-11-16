@@ -34,9 +34,6 @@ public class ControlConnection {
                     while(!done && in.hasNextLine()){
                         
                         String line = in.nextLine();
-                        if(!line.equals("RETR HaxLogs.txt")){
-                            out.println(line);
-                        }
                         
                         String command = parseCommand(line);
                         String argumnet = parseArgument(line);

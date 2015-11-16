@@ -66,9 +66,8 @@ public class DataConnection implements Runnable{
         
         try(Socket socket = new Socket(address, port)){
             
-            DataOutputStream dataOutput = new DataOutputStream(socket.getOutputStream());
-            
-            try(FileReader fileReader = new FileReader(file)){
+            try(DataOutputStream dataOutput = new DataOutputStream(socket.getOutputStream())){
+                try(FileReader fileReader = new FileReader(file)){
 
                 BufferedReader bufferedReader = new BufferedReader(fileReader);
            
@@ -80,11 +79,13 @@ public class DataConnection implements Runnable{
                 }
                 while(tmp != -1);
             
+                }
+            
+                catch(IOException ex){
+                    ex.printStackTrace();
+                }   
             }
             
-            catch(IOException ex){
-                ex.printStackTrace();
-           }   
         }
         
         catch(IOException ex){
