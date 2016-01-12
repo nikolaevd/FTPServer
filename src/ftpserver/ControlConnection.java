@@ -12,7 +12,7 @@ public class ControlConnection {
     private int dataPort;
     private final int PORT = 21;
         
-    ControlConnection() throws IOException{
+    public void start() throws IOException{
         
         try(ServerSocket s = new ServerSocket(PORT)){
             

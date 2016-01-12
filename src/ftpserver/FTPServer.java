@@ -2,9 +2,15 @@
 package ftpserver;
 
 class FTPServer {
-    public static void main(String args[]) throws Exception {
+    public static void main(String args[]) {
         
-        new ControlConnection();   
+        try{
+            ControlConnection controlConnection = new ControlConnection();
+            controlConnection.start();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }  
         
     }
 }
